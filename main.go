@@ -12,7 +12,7 @@ const (
 
 func main() {
 	ctx := context.Background()
-	kafkaHelper := NewKafkaHelper[string](ctx, "kenway", []string{brokerAddress}, "default-group")
+	kafkaHelper := NewKafkaHelper(ctx, "kenway", []string{brokerAddress}, "default-group")
 	eventChannel := make(chan string)
 	defer close(eventChannel)
 	streamingHelper := NewStreamingHelper("https://stream.wikimedia.org/v2/stream/recentchange", eventChannel)

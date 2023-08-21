@@ -17,7 +17,7 @@ type kafkaHelper struct {
 	consumerGroupId string
 }
 
-func NewKafkaHelper[T any](ctx context.Context, topic string, brokerAddress []string, consumerGroupId string) *kafkaHelper {
+func NewKafkaHelper(ctx context.Context, topic string, brokerAddress []string, consumerGroupId string) *kafkaHelper {
 	return &kafkaHelper{
 		ctx:           ctx,
 		brokerAddress: brokerAddress,
