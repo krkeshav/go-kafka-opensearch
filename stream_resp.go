@@ -12,6 +12,7 @@ import (
 type streamingHelper struct {
 	url          string
 	eventChannel chan string
+	stop         bool
 }
 
 func NewStreamingHelper(url string, eventChannel chan string) *streamingHelper {
@@ -30,6 +31,9 @@ func (s *streamingHelper) GetStreamingData() {
 	defer resp.Body.Close()
 	scanner := bufio.NewScanner(resp.Body)
 	for scanner.Scan() {
+		if s.stop {
+			return
+		}
 		event := scanner.Text()
 		s.eventChannel <- event
 	}
@@ -49,6 +53,9 @@ func (s *streamingHelper) GetStreamingDataWithCustomParse() {
 	scanner := bufio.NewScanner(resp.Body)
 	var eventLines []string
 	for scanner.Scan() {
+		if s.stop {
+			return
+		}
 		line := scanner.Text()
 		if line == "" {
 			// Empty line indicates the end of an event
@@ -70,8 +77,15 @@ func (s *streamingHelper) GetServerSentStreamingData() {
 	client := sse.NewClient(s.url)
 	client.Subscribe("", func(msg *sse.Event) {
 		// Got some data!
+		if s.stop {
+			return
+		}
 		s.eventChannel <- string(msg.Data)
 	})
+}
+
+func (s *streamingHelper) StopStreaming() {
+	s.stop = true
 }
 
 func parseEvent(event string) map[string]string {
